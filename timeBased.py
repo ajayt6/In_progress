@@ -11,17 +11,21 @@ from switchyard.lib.address import *
 from switchyard.lib.packet import *
 from switchyard.lib.common import *
 import datetime
+import math
 
-
-def addressTableAdd(addressTable,dev,src):
+def addressTableTrim(addressTable):
     currentTS = datetime.datetime.now()
     if len(addressTable) > 0:
-        for key in addressTable:
+        for key in list(addressTable):
             log_debug("tHE CURRENT TIME IS  {}".format(currentTS))
-            if addressTable[key][1].second - currentTS.second  >= 10:
+            log_debug("tHE packet second  IS  {}".format(addressTable[key][1].second))
+            log_debug("tHE difference IS  {}".format(currentTS.second - addressTable[key][1].second))
+            log_debug("The key is {}".format(key))
+            if ((currentTS.second - addressTable[key][1].second)  >= 10):
+                log_debug("I came inside the condition")
                 addressTable.pop(key)
 
-    addressTable[src] = [dev,datetime.datetime.now()]
+
 
 def switchy_main(net):
     my_interfaces = net.interfaces()
@@ -40,11 +44,15 @@ def switchy_main(net):
         dstMac = packet[0].dst
         srcMac = packet[0].src
 
+        addressTableTrim(addressTable)
+
         if srcMac in addressTable:
             if addressTable[srcMac][0] != dev:
                 addressTable[srcMac][0] = dev
+
+            addressTable[srcMac][1] = datetime.datetime.now()
         else:
-            addressTableAdd(addressTable, dev, srcMac)
+            addressTable[srcMac] = [dev, datetime.datetime.now()]
 
         if dstMac in mymacs:
             log_debug ("Packet intended for me")
