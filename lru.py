@@ -26,7 +26,7 @@ def addressTableAdd(addressTable,dev,src):
                 minTS = addressTable[key][1]
                 delIndex = key
 
-        addressTable.pop(key)
+        addressTable.pop(delIndex)
         addressTable[src] = [dev, currentTS]
 
 

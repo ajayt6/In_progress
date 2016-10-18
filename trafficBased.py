@@ -24,7 +24,7 @@ def addressTableAdd(addressTable,dev,src):
                 minTraffic = addressTable[key][1]
                 delIndex = key
 
-        addressTable.pop(key)
+        addressTable.pop(delIndex)
         addressTable[src] = [dev, 0]
 
 
@@ -56,17 +56,17 @@ def switchy_main(net):
 
         if dstMac in mymacs:
             log_debug ("Packet intended for me")
-        else:
-            if (dstMac not in addressTable) or (dstMac == "FF:FF:FF:FF:FF:FF"):
 
-                # Then flood it to all connected devices (interfaces)
-                for intf in my_interfaces:
-                    if dev != intf.name:
-                        log_debug("Flooding packet {} to {}".format(packet, intf.name))
-                        net.send_packet(intf.name, packet)
+        elif (dstMac not in addressTable) or (dstMac == "ff:ff:ff:ff:ff:ff"):
+
+            # Then flood it to all connected devices (interfaces)
+            for intf in my_interfaces:
+                if dev != intf.name:
+                    log_debug("Flooding packet {} to {}".format(packet, intf.name))
+                    net.send_packet(intf.name, packet)
 
 
-            else:
+        elif (dstMac in addressTable):
                 log_debug("sending to specific device")
                 addressTable[dstMac][1] += 1
                 net.send_packet(addressTable[dstMac][0], packet)
