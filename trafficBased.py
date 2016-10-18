@@ -41,9 +41,11 @@ def switchy_main(net):
         except Shutdown:
             return
 
-        log_debug ("In {} received packet {} on {}".format(net.name, packet, dev))
+        #log_debug ("In {} received packet {} on {}".format(net.name, packet, dev))
         dstMac = packet[0].dst
         srcMac = packet[0].src
+
+        log_debug("Source is {} and dest is {}".format(srcMac, dstMac))
 
 
         if srcMac in addressTable:

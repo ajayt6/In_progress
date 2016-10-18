@@ -1,0 +1,93 @@
+time based
+
+Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:01 IP | IPv4
+        172.16.42.4->172.16.42.1 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:01 IP | IPv4
+        172.16.42.4->172.16.42.1 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:01 IP | IPv4
+        172.16.42.4->172.16.42.1 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+
+Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth3
+    In particular:
+        recv_packet called, but I was expecting send_packet(s)
+        Ethernet 30:00:00:00:00:04->30:00:00:00:00:01 IP | IPv4
+        172.16.42.4->172.16.42.1 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:01 IP | IPv4
+        172.16.42.4->172.16.42.1 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:01 IP | IPv4
+        172.16.42.4->172.16.42.1 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+
+2016-10-18 10:22:30.317000
+
+(Pdb) for k in addressTable: print (str(k) + " " + str(addressTable[k][1]))
+30:00:00:00:00:04 2016-10-18 10:22:30.315210
+30:00:00:00:00:05 2016-10-18 10:22:30.317277
+30:00:00:00:00:01 2016-10-18 10:22:21.300200
+30:00:00:00:00:03 2016-10-18 10:22:30.313570
+30:00:00:00:00:02 2016-10-18 10:22:30.310936
+
+
+LRU scenario
+
+Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth2
+    In particular:
+        recv_packet called, but I was expecting send_packet(s)
+        Ethernet 30:00:00:00:00:08->30:00:00:00:00:04 IP | IPv4
+        172.16.42.8->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:08->30:00:00:00:00:04 IP | IPv4
+        172.16.42.8->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0 and Ethernet
+        30:00:00:00:00:08->30:00:00:00:00:04 IP | IPv4
+        172.16.42.8->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+
+for k in addressTable: print (str(k) + " " + str(addressTable[k][1]))
+30:00:00:00:00:08 10:28:54.632170
+30:00:00:00:00:05 10:28:54.625760
+30:00:00:00:00:03 10:28:54.631246
+30:00:00:00:00:04 10:28:54.632252
+30:00:00:00:00:06 10:28:54.616234
+
+
+traffic scenario:
+
+ Ethernet frame should be forwarded out port eth0
+    In particular:
+        test failed when you called send_packet: output on device
+        eth1 unexpected (I expected this: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:05 IP | IPv4
+        172.16.42.6->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0)
+
+
+(Pdb) for k in addressTable: print (str(k) + " " + str(addressTable[k][1]))
+30:00:00:00:00:04 5
+30:00:00:00:00:03 3
+30:00:00:00:00:02 4
+30:00:00:00:00:01 0
+30:00:00:00:00:06 0
+
+
+
+one of the random outputs when remaining cases are 48: An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+    In particular:
+        send_packet was called, but I was expecting recv_packet
+        Ethernet 30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+
+
+

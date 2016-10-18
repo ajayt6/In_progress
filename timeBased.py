@@ -13,13 +13,15 @@ from switchyard.lib.common import *
 import datetime
 
 
-def addressTableAdd(addressTable,dstMac,src):
+def addressTableAdd(addressTable,dev,src):
     currentTS = datetime.datetime.now()
     if len(addressTable) > 0:
         for key in addressTable:
-            if addressTable[key][1].second - currentTS.second  > 10:
-                addressTable.popitem(key)
-    addressTable[dstMac] = [src,datetime.datetime.now()]
+            log_debug("tHE CURRENT TIME IS  {}".format(currentTS))
+            if addressTable[key][1].second - currentTS.second  >= 10:
+                addressTable.pop(key)
+
+    addressTable[src] = [dev,datetime.datetime.now()]
 
 def switchy_main(net):
     my_interfaces = net.interfaces()
@@ -36,18 +38,30 @@ def switchy_main(net):
 
         log_debug ("In {} received packet {} on {}".format(net.name, packet, dev))
         dstMac = packet[0].dst
+        srcMac = packet[0].src
+
+        if srcMac in addressTable:
+            if addressTable[srcMac][0] != dev:
+                addressTable[srcMac][0] = dev
+        else:
+            addressTableAdd(addressTable, dev, srcMac)
+
         if dstMac in mymacs:
             log_debug ("Packet intended for me")
         else:
-            if dstMac in addressTable:
-                log_debug("sending to specific device")
-                net.send_packet(addressTable[dstMac],packet)
-            else:
-                #Add that entry to the AddressTable
-                addressTableAdd(addressTable,dstMac,packet[0].src)	#This is a naive implementation where address table will grow infinitely if source devices are introduced infinitely
-                #Then flood it to all connected devices (interfaces)
+            if (dstMac not in addressTable) or (dstMac == "FF:FF:FF:FF:FF:FF"):
+
+                # Then flood it to all connected devices (interfaces)
                 for intf in my_interfaces:
-                            if dev != intf.name:
-                                    log_debug ("Flooding packet {} to {}".format(packet, intf.name))
-                                    net.send_packet(intf.name, packet)
+                    if dev != intf.name:
+                        log_debug("Flooding packet {} to {}".format(packet, intf.name))
+                        net.send_packet(intf.name, packet)
+
+
+            else:
+                log_debug("sending to specific device")
+
+                net.send_packet(addressTable[dstMac][0], packet)
+
+
     net.shutdown()
