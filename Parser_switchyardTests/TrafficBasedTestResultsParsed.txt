@@ -1,0 +1,483 @@
+#1
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:01 to 30:00:00:00:00:02 arrives on eth1")
+
+#2
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:02")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:02")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:02")
+
+#3
+testpkt = mk_pkt("30:00:00:00:00:01", "ff:ff:ff:ff:ff:ff", "172.16.42.1", "255.255.255.255")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:01 to ff:ff:ff:ff:ff:ff arrives on eth0")
+
+#4
+testpkt = mk_pkt("30:00:00:00:00:01", "ff:ff:ff:ff:ff:ff", "172.16.42.1", "255.255.255.255")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for ff:ff:ff:ff:ff:ff")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for ff:ff:ff:ff:ff:ff")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for ff:ff:ff:ff:ff:ff")
+
+#5
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:03", "172.16.42.2", "172.16.42.3")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:03 arrives on eth2")
+
+#6
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:03", "172.16.42.2", "172.16.42.3")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:03")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:03")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:03")
+
+#7
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:03 to 30:00:00:00:00:04 arrives on eth3")
+
+#8
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:04")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:04")
+
+#9
+testpkt = mk_pkt("30:00:00:00:00:04", "30:00:00:00:00:05", "172.16.42.4", "172.16.42.5")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:04 to 30:00:00:00:00:05 arrives on eth1")
+
+#10
+testpkt = mk_pkt("30:00:00:00:00:04", "30:00:00:00:00:05", "172.16.42.4", "172.16.42.5")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:05")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:05")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:05")
+
+#11
+testpkt = mk_pkt("30:00:00:00:00:05", "30:00:00:00:00:06", "172.16.42.5", "172.16.42.6")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:05 to 30:00:00:00:00:06 arrives on eth0")
+
+#12
+testpkt = mk_pkt("30:00:00:00:00:05", "30:00:00:00:00:06", "172.16.42.5", "172.16.42.6")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:06")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:06")
+
+#13
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:01 to 30:00:00:00:00:02 arrives on eth1")
+
+#14
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:02")
+
+#15
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:03", "172.16.42.2", "172.16.42.3")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:03 arrives on eth2")
+
+#16
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:03", "172.16.42.2", "172.16.42.3")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:03")
+
+#17
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:03 to 30:00:00:00:00:04 arrives on eth3")
+
+#18
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+
+#19
+testpkt = mk_pkt("30:00:00:00:00:04", "30:00:00:00:00:05", "172.16.42.4", "172.16.42.5")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:04 to 30:00:00:00:00:05 arrives on eth1")
+
+#20
+testpkt = mk_pkt("30:00:00:00:00:04", "30:00:00:00:00:05", "172.16.42.4", "172.16.42.5")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:05")
+
+#21
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:01 to 30:00:00:00:00:02 arrives on eth1")
+
+#22
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:02")
+
+#23
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:03", "172.16.42.2", "172.16.42.3")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:03 arrives on eth2")
+
+#24
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:03", "172.16.42.2", "172.16.42.3")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:03")
+
+#25
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:03 to 30:00:00:00:00:04 arrives on eth3")
+
+#26
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+
+#27
+testpkt = mk_pkt("30:00:00:00:00:04", "30:00:00:00:00:05", "172.16.42.4", "172.16.42.5")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:04 to 30:00:00:00:00:05 arrives on eth1")
+
+#28
+testpkt = mk_pkt("30:00:00:00:00:04", "30:00:00:00:00:05", "172.16.42.4", "172.16.42.5")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:05")
+
+#29
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:04", "172.16.42.6", "172.16.42.4")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:04 arrives on eth2")
+
+#30
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:04", "172.16.42.6", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+
+#31
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:04", "172.16.42.6", "172.16.42.4")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:04 arrives on eth2")
+
+#32
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:04", "172.16.42.6", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+
+#33
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:04", "172.16.42.6", "172.16.42.4")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:04 arrives on eth2")
+
+#34
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:04", "172.16.42.6", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+
+#35
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:02", "172.16.42.6", "172.16.42.2")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:02 arrives on eth2")
+
+#36
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:02", "172.16.42.6", "172.16.42.2")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:02")
+
+#37
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:02", "172.16.42.6", "172.16.42.2")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:02 arrives on eth2")
+
+#38
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:02", "172.16.42.6", "172.16.42.2")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:02")
+
+#39
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:03", "172.16.42.6", "172.16.42.3")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:03 arrives on eth1")
+
+#40
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:03", "172.16.42.6", "172.16.42.3")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:03")
+
+#41
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:05", "172.16.42.6", "172.16.42.5")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 30:00:00:00:00:05 arrives on eth0")
+
+#42
+testpkt = mk_pkt("30:00:00:00:00:06", "30:00:00:00:00:05", "172.16.42.6", "172.16.42.5")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:05")
+
+#43
+testpkt = mk_pkt("30:00:00:00:00:06", "10:00:00:00:00:02", "172.16.42.6", "172.16.40.2")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to 10:00:00:00:00:02 arrives on eth1")
+
+#44
+
+#45
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:06", "172.16.42.7", "172.16.42.6")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:06 arrives on eth0")
+
+#46
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:06", "172.16.42.7", "172.16.42.6")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:06")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:06")
+
+#47
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:07 arrives on eth2")
+
+#48
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:07")
+
+#49
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:07 arrives on eth2")
+
+#50
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:07")
+
+#51
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:07 arrives on eth2")
+
+#52
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:07")
+
+#53
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:07 arrives on eth2")
+
+#54
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:07")
+
+#55
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:07 arrives on eth3")
+
+#56
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:07", "172.16.42.2", "172.16.42.7")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:07")
+
+#57
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:02", "172.16.42.7", "172.16.42.2")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:02 arrives on eth0")
+
+#58
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:02", "172.16.42.7", "172.16.42.2")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:02")
+
+#59
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:03 to 30:00:00:00:00:04 arrives on eth0")
+
+#60
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:04", "172.16.42.3", "172.16.42.4")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:04")
+
+#61
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:05", "172.16.42.3", "172.16.42.5")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:03 to 30:00:00:00:00:05 arrives on eth2")
+
+#62
+testpkt = mk_pkt("30:00:00:00:00:03", "30:00:00:00:00:05", "172.16.42.3", "172.16.42.5")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:05")
+
+#63
+testpkt = mk_pkt("30:00:00:00:00:08", "10:00:00:00:00:04", "172.16.42.8", "172.16.40.3")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:08 to 10:00:00:00:00:04 arrives on eth3")
+
+#64
+
+#65
+testpkt = mk_pkt("30:00:00:00:00:09", "ff:ff:ff:ff:ff:ff", "172.16.42.9", "255.255.255.255")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:09 to ff:ff:ff:ff:ff:ff arrives on eth2")
+
+#66
+testpkt = mk_pkt("30:00:00:00:00:09", "ff:ff:ff:ff:ff:ff", "172.16.42.9", "255.255.255.255")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for ff:ff:ff:ff:ff:ff")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for ff:ff:ff:ff:ff:ff")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for ff:ff:ff:ff:ff:ff")
+
+#67
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:08", "172.16.42.7", "172.16.42.8")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:08 arrives on eth2")
+
+#68
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:08", "172.16.42.7", "172.16.42.8")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:08")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:08")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:08")
+
+#69
+testpkt = mk_pkt("30:00:00:00:00:09", "30:00:00:00:00:02", "172.16.42.9", "172.16.42.2")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:09 to 30:00:00:00:00:02 arrives on eth0")
+
+#70
+testpkt = mk_pkt("30:00:00:00:00:09", "30:00:00:00:00:02", "172.16.42.9", "172.16.42.2")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:02")
+
+#71
+testpkt = mk_pkt("30:00:00:00:00:09", "30:00:00:00:00:02", "172.16.42.9", "172.16.42.2")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:09 to 30:00:00:00:00:02 arrives on eth1")
+
+#72
+testpkt = mk_pkt("30:00:00:00:00:09", "30:00:00:00:00:02", "172.16.42.9", "172.16.42.2")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:02")
+
+#73
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#74
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#75
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#76
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#77
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#78
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#79
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#80
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#81
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#82
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#83
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#84
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#85
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth0", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth0")
+
+#86
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#87
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:07 to 30:00:00:00:00:09 arrives on eth3")
+
+#88
+testpkt = mk_pkt("30:00:00:00:00:07", "30:00:00:00:00:09", "172.16.42.7", "172.16.42.9")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:09")
+
+#89
+testpkt = mk_pkt("30:00:00:00:00:0a", "30:00:00:00:00:05", "172.16.42.10", "172.16.42.5")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:0a to 30:00:00:00:00:05 arrives on eth2")
+
+#90
+testpkt = mk_pkt("30:00:00:00:00:0a", "30:00:00:00:00:05", "172.16.42.10", "172.16.42.5")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for 30:00:00:00:00:05")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:05")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:05")
+
+#91
+testpkt = mk_pkt("30:00:00:00:00:06", "ff:ff:ff:ff:ff:ff", "172.16.42.6", "255.255.255.255")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:06 to ff:ff:ff:ff:ff:ff arrives on eth1")
+
+#92
+testpkt = mk_pkt("30:00:00:00:00:06", "ff:ff:ff:ff:ff:ff", "172.16.42.6", "255.255.255.255")
+s.expect(PacketOutputEvent("eth3", testpkt, display=Ethernet), "Frame sent out on eth3 outbound for ff:ff:ff:ff:ff:ff")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for ff:ff:ff:ff:ff:ff")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for ff:ff:ff:ff:ff:ff")
+
+#93
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#94
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#95
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#96
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#97
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#98
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#99
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#100
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#101
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#102
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#103
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#104
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#105
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#106
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#107
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#108
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#109
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth2", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth2")
+
+#110
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#111
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketInputEvent("eth1", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:02 to 30:00:00:00:00:06 arrives on eth1")
+
+#112
+testpkt = mk_pkt("30:00:00:00:00:02", "30:00:00:00:00:06", "172.16.42.2", "172.16.42.6")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:06")
+
+#113
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:01 to 30:00:00:00:00:02 arrives on eth3")
+
+#114
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:02", "172.16.42.1", "172.16.42.2")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:02")
+
+#115
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:07", "172.16.42.1", "172.16.42.7")
+s.expect(PacketInputEvent("eth3", testpkt, display=Ethernet), "An ethernet frame from 30:00:00:00:00:01 to 30:00:00:00:00:07 arrives on eth3")
+
+#116
+testpkt = mk_pkt("30:00:00:00:00:01", "30:00:00:00:00:07", "172.16.42.1", "172.16.42.7")
+s.expect(PacketOutputEvent("eth1", testpkt, display=Ethernet), "Frame sent out on eth1 outbound for 30:00:00:00:00:07")
+s.expect(PacketOutputEvent("eth2", testpkt, display=Ethernet), "Frame sent out on eth2 outbound for 30:00:00:00:00:07")
+s.expect(PacketOutputEvent("eth0", testpkt, display=Ethernet), "Frame sent out on eth0 outbound for 30:00:00:00:00:07")

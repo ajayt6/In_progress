@@ -1,0 +1,716 @@
+1   An Ethernet frame from 30:00:00:00:00:01 to
+    30:00:00:00:00:02 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+2   Ethernet frame should be flooded out ports eth0 and eth2 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2 and Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+3   An Ethernet frame with a broadcast destination address
+    should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:01->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.1->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) on eth0
+4   Ethernet frame should be flooded out ports eth1 and eth2 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:01->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.1->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth3 and Ethernet
+        30:00:00:00:00:01->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.1->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth1 and Ethernet
+        30:00:00:00:00:01->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.1->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth2
+5   An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:03 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+6   Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+7   An Ethernet frame from 30:00:00:00:00:03 to
+    30:00:00:00:00:04 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+8   Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth2
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2 and Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+9   An Ethernet frame from 30:00:00:00:00:04 to
+    30:00:00:00:00:05 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+10  Ethernet frame should be flooded out ports eth0 and eth2 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2 and Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+11  An Ethernet frame from 30:00:00:00:00:05 to
+    30:00:00:00:00:06 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:05->30:00:00:00:00:06 IP | IPv4
+        172.16.42.5->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+12  Ethernet frame should be flooded out ports eth1 and eth2 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:05->30:00:00:00:00:06 IP | IPv4
+        172.16.42.5->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:05->30:00:00:00:00:06 IP | IPv4
+        172.16.42.5->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:05->30:00:00:00:00:06 IP | IPv4
+        172.16.42.5->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+13  An Ethernet frame from 30:00:00:00:00:01 to
+    30:00:00:00:00:02 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+14  Ethernet frame should be forwarded out port eth2
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+15  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:03 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+16  Ethernet frame should be forwarded out port eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3
+17  An Ethernet frame from 30:00:00:00:00:03 to
+    30:00:00:00:00:04 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+18  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+19  An Ethernet frame from 30:00:00:00:00:04 to
+    30:00:00:00:00:05 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+20  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+21  An Ethernet frame from 30:00:00:00:00:01 to
+    30:00:00:00:00:02 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+22  Ethernet frame should be forwarded out port eth2
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+23  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:03 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+24  Ethernet frame should be forwarded out port eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:03 IP | IPv4
+        172.16.42.2->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3
+25  An Ethernet frame from 30:00:00:00:00:03 to
+    30:00:00:00:00:04 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+26  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+27  An Ethernet frame from 30:00:00:00:00:04 to
+    30:00:00:00:00:05 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+28  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:04->30:00:00:00:00:05 IP | IPv4
+        172.16.42.4->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+29  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:04 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:04 IP | IPv4
+        172.16.42.6->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+30  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:04 IP | IPv4
+        172.16.42.6->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+31  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:04 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:04 IP | IPv4
+        172.16.42.6->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+32  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:04 IP | IPv4
+        172.16.42.6->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+33  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:04 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:04 IP | IPv4
+        172.16.42.6->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+34  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:04 IP | IPv4
+        172.16.42.6->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+35  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:02 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:02 IP | IPv4
+        172.16.42.6->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+36  Ethernet frame should be forwarded out port eth2
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:02 IP | IPv4
+        172.16.42.6->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+37  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:02 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:02 IP | IPv4
+        172.16.42.6->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+38  Ethernet frame should be forwarded out port eth2
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:02 IP | IPv4
+        172.16.42.6->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+39  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:03 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:03 IP | IPv4
+        172.16.42.6->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+40  Ethernet frame should be forwarded out port eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:03 IP | IPv4
+        172.16.42.6->172.16.42.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3
+41  An Ethernet frame from 30:00:00:00:00:06 to
+    30:00:00:00:00:05 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:05 IP | IPv4
+        172.16.42.6->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+42  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->30:00:00:00:00:05 IP | IPv4
+        172.16.42.6->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+43  An Ethernet frame should arrive on eth1 with destination
+    address the same as eth1's MAC address
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->10:00:00:00:00:02 IP | IPv4
+        172.16.42.6->172.16.40.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+44  Switch does not do anything
+        Expected event: timeout on recv_packet
+45  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:06 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:06 IP | IPv4
+        172.16.42.7->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+46  Ethernet frame should be flooded out port eth1 and eth2 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:06 IP | IPv4
+        172.16.42.7->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:06 IP | IPv4
+        172.16.42.7->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:06 IP | IPv4
+        172.16.42.7->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2
+47  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:07 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+48  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+49  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:07 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+50  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+51  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:07 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+52  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+53  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:07 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+54  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+55  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:07 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+56  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:07 IP | IPv4
+        172.16.42.2->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+57  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:02 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:02 IP | IPv4
+        172.16.42.7->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+58  Ethernet frame should be forwarded out port eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:02 IP | IPv4
+        172.16.42.7->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3
+59  An Ethernet frame from 30:00:00:00:00:03 to
+    30:00:00:00:00:04 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+60  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+61  An Ethernet frame from 30:00:00:00:00:03 to
+    30:00:00:00:00:05 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:05 IP | IPv4
+        172.16.42.3->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+62  Ethernet frame should be forwarded out port eth0
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:05 IP | IPv4
+        172.16.42.3->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+63  An Ethernet frame should arrive on eth3 with destination
+    address the same as eth3's MAC address
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:08->10:00:00:00:00:04 IP | IPv4
+        172.16.42.8->172.16.40.3 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+64  Switch does not do anything
+        Expected event: timeout on recv_packet
+65  An Ethernet frame with a broadcast destination address
+    should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:09->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.9->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) on eth2
+66  Ethernet frame should be flooded out port eth0 and eth1 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:09->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.9->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth3 and Ethernet
+        30:00:00:00:00:09->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.9->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth1 and Ethernet
+        30:00:00:00:00:09->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.9->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth0
+67  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:08 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:08 IP | IPv4
+        172.16.42.7->172.16.42.8 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+68  Ethernet frame should be flooded out port eth0 and eth1 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:08 IP | IPv4
+        172.16.42.7->172.16.42.8 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3 and Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:08 IP | IPv4
+        172.16.42.7->172.16.42.8 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:08 IP | IPv4
+        172.16.42.7->172.16.42.8 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
+69  An Ethernet frame from 30:00:00:00:00:09 to
+    30:00:00:00:00:02 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:09->30:00:00:00:00:02 IP | IPv4
+        172.16.42.9->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+70  Ethernet frame should be forwarded out port eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:09->30:00:00:00:00:02 IP | IPv4
+        172.16.42.9->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3
+71  An Ethernet frame from 30:00:00:00:00:09 to
+    30:00:00:00:00:02 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:09->30:00:00:00:00:02 IP | IPv4
+        172.16.42.9->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+72  Ethernet frame should be forwarded out port eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:09->30:00:00:00:00:02 IP | IPv4
+        172.16.42.9->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth3
+73  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+74  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+75  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+76  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+77  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+78  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+79  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+80  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+81  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+82  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+83  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+84  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+85  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth0
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth0
+86  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+87  An Ethernet frame from 30:00:00:00:00:07 to
+    30:00:00:00:00:09 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+88  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:07->30:00:00:00:00:09 IP | IPv4
+        172.16.42.7->172.16.42.9 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+89  An Ethernet frame from 30:00:00:00:00:0a to
+    30:00:00:00:00:05 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:0a->30:00:00:00:00:05 IP | IPv4
+        172.16.42.10->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) on eth2
+90  Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:0a->30:00:00:00:00:05 IP | IPv4
+        172.16.42.10->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth3 and Ethernet
+        30:00:00:00:00:0a->30:00:00:00:00:05 IP | IPv4
+        172.16.42.10->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth1 and Ethernet
+        30:00:00:00:00:0a->30:00:00:00:00:05 IP | IPv4
+        172.16.42.10->172.16.42.5 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth0
+91  An Ethernet frame with a broadcast destination address
+    should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:06->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.6->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) on eth1
+92  Ethernet frame should be flooded out ports eth0 and eth2 and
+    eth3
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:06->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.6->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth3 and Ethernet
+        30:00:00:00:00:06->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.6->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth2 and Ethernet
+        30:00:00:00:00:06->ff:ff:ff:ff:ff:ff IP | IPv4
+        172.16.42.6->255.255.255.255 ICMP | ICMP EchoRequest 0 0 (0
+        data bytes) out eth0
+93  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+94  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+95  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+96  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+97  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+98  Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+99  An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+100 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+101 An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+102 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+103 An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+104 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+105 An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+106 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+107 An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+108 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+109 An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth2
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth2
+110 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+111 An Ethernet frame from 30:00:00:00:00:02 to
+    30:00:00:00:00:06 should arrive on eth1
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth1
+112 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:02->30:00:00:00:00:06 IP | IPv4
+        172.16.42.2->172.16.42.6 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+113 An Ethernet frame from 30:00:00:00:00:01 to
+    30:00:00:00:00:02 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+114 Ethernet frame should be forwarded out port eth1
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:02 IP | IPv4
+        172.16.42.1->172.16.42.2 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1
+115 An Ethernet frame from 30:00:00:00:00:01 to
+    30:00:00:00:00:07 should arrive on eth3
+        Expected event: recv_packet Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:07 IP | IPv4
+        172.16.42.1->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) on eth3
+116 Ethernet frame should be flooded out ports eth0 and eth1 and
+    eth2
+        Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:07 IP | IPv4
+        172.16.42.1->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:07 IP | IPv4
+        172.16.42.1->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2 and Ethernet
+        30:00:00:00:00:01->30:00:00:00:00:07 IP | IPv4
+        172.16.42.1->172.16.42.7 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0

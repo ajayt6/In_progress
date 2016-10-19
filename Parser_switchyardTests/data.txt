@@ -1,0 +1,10 @@
+Expected event: send_packet(s) Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth1 and Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth2 and Ethernet
+        30:00:00:00:00:03->30:00:00:00:00:04 IP | IPv4
+        172.16.42.3->172.16.42.4 ICMP | ICMP EchoRequest 0 0 (0 data
+        bytes) out eth0
