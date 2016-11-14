@@ -110,8 +110,11 @@ class Router(object):
 
 					icmp_reply = ICMP()
 					icmp_reply.icmptype = ICMPType.EchoReply
-					icmp_reply.icmptype.sequence = icmp.icmptype.sequence
-					icmp_reply.icmptype.identifier = icmp.icmptype.identifier
+					icmp_reply.icmpdata.sequence = icmp.icmpdata.sequence
+					#	icmp_reply.sequence \
+					#seq	= icmp.icmpdata.sequence
+					log_debug("the icmp is {}".format(str(icmp)))
+					icmp_reply.icmpdata.identifier = icmp.icmpdata.identifier
 					icmp_reply.icmpdata.data = icmp.icmpdata.data
 
 					ip_reply = IPv4()
@@ -121,7 +124,7 @@ class Router(object):
 					ip_reply.ttl = 30  # Find standard and change ttl to that
 
 					reply_pkt = ip_reply + icmp_reply
-					router_forward(dev,reply_pkt)
+					self.router_forward(dev,reply_pkt)
 				else:	#An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request
 					# --------------------------------------Item 5 Part 4 starts here ----------------------------------
 					if (ip.ttl == 0):
@@ -139,7 +142,7 @@ class Router(object):
 						ip_reply.ttl = 30  # Find standard and change ttl to that
 
 						reply_pkt = ip_reply + icmp_reply
-						router_forward(dev, reply_pkt)
+						self.router_forward(dev, reply_pkt)
 					# --------------------------------------Item 5 Part 4 ends here ----------------------------------
 			# --------------------------------------Item 4 ends here -------------------------------------------
 			# --------------------------------------Item 5 Part 1 starts here ----------------------------------
@@ -158,7 +161,7 @@ class Router(object):
 				ip_reply.ttl = 30  # Find standard and change ttl to that
 
 				reply_pkt = ip_reply + icmp_reply
-				router_forward(dev, reply_pkt)
+				self.router_forward(dev, reply_pkt)
 			# --------------------------------------Item 5 Part 1 ends here -----------------------------------
 			elif IPv4Address(nexthop) in [intf.ipaddr for intf in self.interfaces]:
 				log_debug("Packet meant for the router. Do nothing.")
@@ -181,7 +184,7 @@ class Router(object):
 					ip_reply.ttl = 30  # Find standard and change ttl to that
 
 					reply_pkt = ip_reply + icmp_reply
-					router_forward(dev, reply_pkt)
+					self.router_forward(dev, reply_pkt)
 				# --------------------------------------Item 5 Part 2 ends here ----------------------------------_
 
 				all_ports = [intf.name for intf in self.interfaces]
@@ -250,7 +253,7 @@ class Router(object):
 							ip_reply.ttl = 30  # Find standard and change ttl to that
 
 							reply_pkt = ip_reply + icmp_reply
-							router_forward(self.buffer_info[key][5], reply_pkt)
+							self.router_forward(self.buffer_info[key][5], reply_pkt)
 						# --------------------------------------Item 5 Part 3 ends here ----------------------------------_
 						del self.buffer[key]
 						del self.buffer_info[key]
@@ -263,7 +266,7 @@ class Router(object):
 				
 			try:
 				dev,pkt = self.net.recv_packet(timeout=1.0)
-				router_forward(dev,pkt)
+				self.router_forward(dev,pkt)
 
 				
 			except NoPackets:
