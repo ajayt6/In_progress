@@ -33,8 +33,9 @@ class Router(object):
 				#print(intf.netmask, str(intf.netmask), intf.ipaddr, str(intf.ipaddr), netaddr)
 
 		#Uncomment to see the entries in the forwarding table
-		#for item in self.fwd_table:
-		#	print (item, self.fwd_table[item])
+		for item in self.fwd_table:
+			print (item, self.fwd_table[item])
+		print("")
 
 	def router_forward_table_lookup(self,dstaddr):
 		match = 0
@@ -48,6 +49,15 @@ class Router(object):
 					match = netaddr.prefixlen
 					port = val[2]
 					nexthop = val[1]
+		if port != '':
+
+			# Once we know the nexthop, I do one crucial thing here
+			# if next hop is one of the IPs on the router interfaces, dst in same subnet as router interface
+			# change next hop to the dst which we already have
+			myIPs = [intf.ipaddr for intf in self.interfaces]
+			if IPv4Address(nexthop) in myIPs:
+				nexthop = str(dstaddr)
+
 		return port,nexthop
 
 	def router_icmp_forward_helper(self,icmp_reply,dstaddr,src):
@@ -60,15 +70,20 @@ class Router(object):
 		# Find the port to be used to send the packet out through using the forwarding table
 		port, nexthop = self.router_forward_table_lookup(ip_reply.dst)
 
+		#ip_reply.src = nexthop
+		print("The port is: " + port + " and the next hop is: " + nexthop + "and the original source is: " + str(src) + " and the orig dest is: " + str(dstaddr))
 		all_ports = [intf.name for intf in self.interfaces]
 		port_index = all_ports.index(port)
 		ether_reply = Ethernet()
 		srchwaddr = self.interfaces[port_index].ethaddr
 		ether_reply.src = srchwaddr
+		if icmp_reply.icmptype != ICMPType.EchoReply:
+			ip_reply.src = self.interfaces[port_index].ipaddr
 		ether_reply.dst = 'ff:ff:ff:ff:ff:ff'
 
-		reply_pkt = ip_reply + icmp_reply + ether_reply
+		reply_pkt = ether_reply + ip_reply + icmp_reply
 		# debugger()
+		print("The icmp packet going to be sent is: " + str(reply_pkt))
 		self.router_forward(port, reply_pkt)
 
 	def router_forward(self,dev,pkt):
@@ -109,7 +124,11 @@ class Router(object):
 						port_index = names.index(port)
 						ether.src = self.interfaces[port_index].ethaddr
 						buffer_pkt.insert_header(eth_index, ether)
+						print("The buffer packets going to be sent are: " + str(buffer_pkt))
 						self.net.send_packet(port, buffer_pkt)
+					del self.buffer[str(arp.senderprotoaddr)]
+					del self.buffer_info[str(arp.senderprotoaddr)]
+					print("entry deleted")
 					# ---------------------------------------Item 3 ends here ---------------------------------------------
 		else:
 			log_debug("No ARP headers in the packet")
@@ -118,6 +137,11 @@ class Router(object):
 		ip = pkt.get_header(IPv4)
 		if ip is not None:
 			dstaddr = ip.dst
+
+			# Find the port to be used to send the packet out through using the forwarding table
+			port, nexthop = self.router_forward_table_lookup(ip.dst)
+
+			'''
 			match = 0
 			port = ''
 			nexthop = ''
@@ -129,15 +153,17 @@ class Router(object):
 						match = netaddr.prefixlen
 						port = val[2]
 						nexthop = val[1]
+			print("the next hop for " + str(ip) + " is: " + str(nexthop))
 
-			# Once we know the nexthop, I do one crucial thing here
-			# if next hop is one of the IPs on the router interfaces, dst in same subnet as router interface
-			# change next hop to the dst which we already have
-			myIPs = [intf.ipaddr for intf in self.interfaces]
-			if IPv4Address(nexthop) in myIPs:
-				nexthop = str(ip.dst)
-			# print("nexthop is : ", nexthop)
-
+			if port!='':
+				# Once we know the nexthop, I do one crucial thing here
+				# if next hop is one of the IPs on the router interfaces, dst in same subnet as router interface
+				# change next hop to the dst which we already have
+				myIPs = [intf.ipaddr for intf in self.interfaces]
+				if IPv4Address(nexthop) in myIPs:
+					nexthop = str(ip.dst)
+				# print("nexthop is : ", nexthop)
+			'''
 
 			# --------------------------------------Item 4starts here
 			if dstaddr in [intf.ipaddr for intf in self.interfaces]:  # The destination is one of the interfaces of the router.
@@ -147,51 +173,58 @@ class Router(object):
 
 				# --------------------------------------Item 5 Part 2 starts here ----------------------------------
 				if (ip.ttl == 0):
-					debugger()
+					#debugger()
 					log_debug("TTL = 0.Sending a ICMP time exceeded error message.")
+					print("At my router packet ttl==0 check")
 					icmp_reply = ICMP()
 					icmp_reply.icmptype = ICMPType.TimeExceeded
 					icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.TimeExceeded].TTLExpired
+					ether_header = pkt.get_header_index(Ethernet)
+					del pkt[ether_header]
 					icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
 					icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
 					self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
 				# --------------------------------------Item 5 Part 2 ends here ----------------------------------_
+				else:
+					icmp = pkt.get_header(ICMP)
+					if icmp is not None and icmp.icmptype == ICMPType.EchoRequest:
 
-				icmp = pkt.get_header(ICMP)
-				if icmp is not None and icmp.icmptype == ICMPType.EchoRequest:
+						icmp_reply = ICMP()
+						icmp_reply.icmptype = ICMPType.EchoReply
+						icmp_reply.icmpdata.sequence = icmp.icmpdata.sequence
+						#	icmp_reply.sequence \
+						# seq	= icmp.icmpdata.sequence
+						log_debug("the icmp is {}".format(str(icmp)))
+						icmp_reply.icmpdata.identifier = icmp.icmpdata.identifier
+						icmp_reply.icmpdata.data = icmp.icmpdata.data
 
-					icmp_reply = ICMP()
-					icmp_reply.icmptype = ICMPType.EchoReply
-					icmp_reply.icmpdata.sequence = icmp.icmpdata.sequence
-					#	icmp_reply.sequence \
-					# seq	= icmp.icmpdata.sequence
-					log_debug("the icmp is {}".format(str(icmp)))
-					icmp_reply.icmpdata.identifier = icmp.icmpdata.identifier
-					icmp_reply.icmpdata.data = icmp.icmpdata.data
+						self.router_icmp_forward_helper(icmp_reply,dstaddr,ip.src)
 
-					self.router_icmp_forward_helper(icmp_reply,dstaddr,ip.src)
+					else:  # An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request
+						# --------------------------------------Item 5 Part 4 starts here ----------------------------------
 
-				else:  # An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request
-					# --------------------------------------Item 5 Part 4 starts here ----------------------------------
+						log_debug(
+							"An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request.Sending a ICMP port unreachable error message.")
+						icmp_reply = ICMP()
+						icmp_reply.icmptype = ICMPType.DestinationUnreachable
+						icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].PortUnreachable
+						ether_header = pkt.get_header_index(Ethernet)
+						del pkt[ether_header]
+						icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
+						icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
-					log_debug(
-						"An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request.Sending a ICMP port unreachable error message.")
-					icmp_reply = ICMP()
-					icmp_reply.icmptype = ICMPType.DestinationUnreachable
-					icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].PortUnreachable
-					icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
-					icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
-
-					self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
-				# --------------------------------------Item 5 Part 4 ends here ----------------------------------
-				# --------------------------------------Item 4 ends here -------------------------------------------
-					# --------------------------------------Item 5 Part 1 starts here ----------------------------------
+						self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
+						# --------------------------------------Item 5 Part 4 ends here ----------------------------------
+						# --------------------------------------Item 4 ends here -------------------------------------------
+						# --------------------------------------Item 5 Part 1 starts here ----------------------------------
 			elif port == '':
 				log_debug("No match found. Sending a destination network unreachable error ICMP reply.")
 				icmp_reply = ICMP()
 				icmp_reply.icmptype = ICMPType.DestinationUnreachable
 				icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].NetworkUnreachable
+				ether_header = pkt.get_header_index(Ethernet)
+				del pkt[ether_header]
 				icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
 				icmp_reply.icmpdata.origdgramlen = len(pkt)	#This should be optional probably
 
@@ -205,57 +238,67 @@ class Router(object):
 				# --------------------------------------Item 5 Part 2 starts here ----------------------------------
 				if(ip.ttl == 0):
 					log_debug("TTL = 0.Sending a ICMP time exceeded error message.")
+					print("At generic ttl==0 check")
 					icmp_reply = ICMP()
 					icmp_reply.icmptype = ICMPType.TimeExceeded
 					icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.TimeExceeded].TTLExpired
+					ether_header = pkt.get_header_index(Ethernet)
+					del pkt[ether_header]
 					icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
 					icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
 					self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
 				# --------------------------------------Item 5 Part 2 ends here ----------------------------------_
+				else:
+
+					all_ports = [intf.name for intf in self.interfaces]
+					port_index = all_ports.index(port)
+
+					if IPv4Address(nexthop) not in self.ip_mac_dict:  # check if nexthop IP not in ARP cache
+						if nexthop not in self.buffer:  # check if there are no packets for dst IP address
+							# Construct an ARP packet to find the mac address of next hop
+							ether = Ethernet()
+							srchwaddr = self.interfaces[port_index].ethaddr
+							ether.src = srchwaddr
+							ether.dst = 'ff:ff:ff:ff:ff:ff'
+							ether.ethertype = EtherType.ARP
+							arp = Arp()
+							arp.operation = ArpOperation.Request
+							arp.senderhwaddr = self.interfaces[port_index].ethaddr
+							arp.targethwaddr = 'ff:ff:ff:ff:ff:ff'
+							arp.senderprotoaddr = self.interfaces[port_index].ipaddr
+							arp.targetprotoaddr = nexthop
+							arppacket = ether + arp
+
+							print("going to add to buffer the key : " + nexthop)
+							# Create entry for nexthop IP & buffer the packet
+							self.buffer[nexthop] = []
+							self.buffer[nexthop].append(pkt)
+							self.buffer_info[nexthop] = [port, time.time() * 1000, arppacket, 1, ip.src, ip.dst]
+
+							print("The buffer is : " + str(self.buffer))
+							print("The buffer info is : " + str(self.buffer_info))
+							# Send an ARP request
+							print("The arp packet going to be sent is " + str(arppacket))
+							self.net.send_packet(port, arppacket)
+						else:  # no need to send ARP request, store the packet in the buffer
+							self.buffer[nexthop].append(pkt)
 
 
-				all_ports = [intf.name for intf in self.interfaces]
-				port_index = all_ports.index(port)
+					else:  # nexthop IP lookup in the ARP cache
+						eth_index = pkt.get_header_index(Ethernet)
+						ether = pkt.get_header(Ethernet)
+						del pkt[eth_index]
+						# modify MAC headers,src : MAC address of router interface, dst : MAC address of next hop
+						ether.dst = self.ip_mac_dict[IPv4Address(nexthop)]
+						names = [intf.name for intf in self.interfaces]
+						port_index = names.index(port)
+						ether.src = self.interfaces[port_index].ethaddr
+						pkt.insert_header(eth_index, ether)
 
-				if IPv4Address(nexthop) not in self.ip_mac_dict:  # check if nexthop IP not in ARP cache
-					if nexthop not in self.buffer:  # check if there are no packets for dst IP address
-						# Construct an ARP packet to find the mac address of next hop
-						ether = Ethernet()
-						srchwaddr = self.interfaces[port_index].ethaddr
-						ether.src = srchwaddr
-						ether.dst = 'ff:ff:ff:ff:ff:ff'
-						ether.ethertype = EtherType.ARP
-						arp = Arp()
-						arp.operation = ArpOperation.Request
-						arp.senderhwaddr = self.interfaces[port_index].ethaddr
-						arp.targethwaddr = 'ff:ff:ff:ff:ff:ff'
-						arp.senderprotoaddr = self.interfaces[port_index].ipaddr
-						arp.targetprotoaddr = nexthop
-						arppacket = ether + arp
-
-						# Create entry for nexthop IP & buffer the packet
-						self.buffer[nexthop] = []
-						self.buffer[nexthop].append(pkt)
-						self.buffer_info[nexthop] = [port, time.time() * 1000, arppacket, 1, ip.src, ip.dst]
-						# Send an ARP request
-						self.net.send_packet(port, arppacket)
-					else:  # no need to send ARP request, store the packet in the buffer
-						self.buffer[nexthop].append(pkt)
-
-				else:  # nexthop IP lookup in the ARP cache
-					eth_index = pkt.get_header_index(Ethernet)
-					ether = pkt.get_header(Ethernet)
-					del pkt[eth_index]
-					# modify MAC headers,src : MAC address of router interface, dst : MAC address of next hop
-					ether.dst = self.ip_mac_dict[IPv4Address(nexthop)]
-					names = [intf.name for intf in self.interfaces]
-					port_index = names.index(port)
-					ether.src = self.interfaces[port_index].ethaddr
-					pkt.insert_header(eth_index, ether)
-
-					self.net.send_packet(port, pkt)
-				# -------------------------------------Item 2 ends here ----------------------------
+						print("The packet going to be forwarded is: " + str(pkt))
+						self.net.send_packet(port, pkt)
+					# -------------------------------------Item 2 ends here ----------------------------
 
 	def router_main(self):    
 		while True:
@@ -269,36 +312,44 @@ class Router(object):
 					if self.buffer_info[key][3] == 5:	#Send ICMP error message if ARP request is not satisfied even after 5 retransmissions
 						# --------------------------------------Item 5 Part 3 starts here ----------------------------------
 
-						log_debug("5 retransmissions of ARP query over.Sending a ICMP host unreachable error message.")
-						icmp_reply = ICMP()
-						icmp_reply.icmptype = ICMPType.DestinationUnreachable
-						icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].HostUnreachable
-						icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
-						icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
+						log_debug("5 retransmissions of ARP query over.Sending a ICMP host unreachable error message for each packet that was meant for unreachable host.")
+						for item in self.buffer[key]:
+							icmp_reply = ICMP()
+							icmp_reply.icmptype = ICMPType.DestinationUnreachable
+							icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].HostUnreachable
+							ether_header = item.get_header_index(Ethernet)
+							del item[ether_header]
+							icmp_reply.icmpdata.data = item.to_bytes()[:28]
+							icmp_reply.icmpdata.origdgramlen = len(item)  # This should be optional probably
 
-						'''
-						ip_reply = IPv4()
-						ip_reply.protocol = IPProtocol.ICMP
-						ip_reply.src = self.buffer_info[key][5]
-						ip_reply.dst = self.buffer_info[key][4]
-						ip_reply.ttl = 30  # Find standard and change ttl to that
+							'''
+							ip_reply = IPv4()
+							ip_reply.protocol = IPProtocol.ICMP
+							ip_reply.src = self.buffer_info[key][5]
+							ip_reply.dst = self.buffer_info[key][4]
+							ip_reply.ttl = 30  # Find standard and change ttl to that
 
-						reply_pkt = ip_reply + icmp_reply
-						self.router_forward(self.buffer_info[key][5], reply_pkt)
-						'''
-						self.router_icmp_forward_helper(icmp_reply, self.buffer_info[key][5], self.buffer_info[key][4])
+							reply_pkt = ip_reply + icmp_reply
+							self.router_forward(self.buffer_info[key][5], reply_pkt)
+							'''
+							print("an icmp error is going to be sent for : " + str(self.buffer_info[key]))
+							self.router_icmp_forward_helper(icmp_reply, self.buffer_info[key][5], self.buffer_info[key][4])
 						# --------------------------------------Item 5 Part 3 ends here ----------------------------------_
+						print("going to delete relevant entries")
 						del self.buffer[key]
 						del self.buffer_info[key]
 					else:
 						#update count and time, send new ARP request
 						self.buffer_info[key][3] += 1
 						self.buffer_info[key][1] = time.time()*1000
+						print("The arp request to be resend from buffer is: " + str(self.buffer_info[key][2]))
+						print("The retransmission try is: " + str(self.buffer_info[key][3]))
 						self.net.send_packet(self.buffer_info[key][0], self.buffer_info[key][2])
 			#------------------------------------------------------------------------------------------------
 				
 			try:
 				dev,pkt = self.net.recv_packet(timeout=1.0)
+				print("The received packet to router is: " + str(pkt))
 				self.router_forward(dev,pkt)
 
 				
