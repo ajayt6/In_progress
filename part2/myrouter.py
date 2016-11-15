@@ -6,6 +6,7 @@ import time
 from switchyard.lib.packet import *
 from switchyard.lib.address import *
 from switchyard.lib.common import *
+import collections
 
 class Router(object):
 	def __init__(self, net):
@@ -13,8 +14,8 @@ class Router(object):
 		self.interfaces = net.interfaces()
 		self.ip_mac_dict = {}
 		self.fwd_table = {}
-		self.buffer = {}
-		self.buffer_info = {} #List of port, time, arppacket for resend, count, src ip of original sender, icoming port of original packet
+		self.buffer = collections.OrderedDict()
+		self.buffer_info = collections.OrderedDict() #List of port, time, arppacket for resend, count, src ip of original sender, dst ip of original sender
 		
 		#Use static forwarding table
 		f = open('forwarding_table.txt', 'r')
@@ -35,7 +36,43 @@ class Router(object):
 		#for item in self.fwd_table:
 		#	print (item, self.fwd_table[item])
 
+	def router_forward_table_lookup(self,dstaddr):
+		match = 0
+		port = ''
+		nexthop = ''
+		for key in self.fwd_table:
+			val = self.fwd_table[key]
+			netaddr = IPv4Network(str(key) + "/" + str(val[0]))
+			if dstaddr in netaddr:
+				if netaddr.prefixlen > match:
+					match = netaddr.prefixlen
+					port = val[2]
+					nexthop = val[1]
+		return port,nexthop
+
+	def router_icmp_forward_helper(self,icmp_reply,dstaddr,src):
+		ip_reply = IPv4()
+		ip_reply.protocol = IPProtocol.ICMP
+		ip_reply.src = dstaddr
+		ip_reply.dst = src
+		ip_reply.ttl = 30  # Find standard and change ttl to that
+
+		# Find the port to be used to send the packet out through using the forwarding table
+		port, nexthop = self.router_forward_table_lookup(ip_reply.dst)
+
+		all_ports = [intf.name for intf in self.interfaces]
+		port_index = all_ports.index(port)
+		ether_reply = Ethernet()
+		srchwaddr = self.interfaces[port_index].ethaddr
+		ether_reply.src = srchwaddr
+		ether_reply.dst = 'ff:ff:ff:ff:ff:ff'
+
+		reply_pkt = ip_reply + icmp_reply + ether_reply
+		# debugger()
+		self.router_forward(port, reply_pkt)
+
 	def router_forward(self,dev,pkt):
+
 		arp = pkt.get_header(Arp)
 		if arp is not None:
 			# ---------------------------------Item 1 starts here-------------------------------------------
@@ -101,10 +138,26 @@ class Router(object):
 				nexthop = str(ip.dst)
 			# print("nexthop is : ", nexthop)
 
-			# --------------------------------------Item 4 starts here ------------------------------------------
-			if dstaddr in [intf.ipaddr for intf in
-						   self.interfaces]:  # The destination is one of the interfaces of the router.
+
+			# --------------------------------------Item 4starts here
+			if dstaddr in [intf.ipaddr for intf in self.interfaces]:  # The destination is one of the interfaces of the router.
 				# For this router, handle ICMP echo requests in this case
+
+				ip.ttl -= 1
+
+				# --------------------------------------Item 5 Part 2 starts here ----------------------------------
+				if (ip.ttl == 0):
+					debugger()
+					log_debug("TTL = 0.Sending a ICMP time exceeded error message.")
+					icmp_reply = ICMP()
+					icmp_reply.icmptype = ICMPType.TimeExceeded
+					icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.TimeExceeded].TTLExpired
+					icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
+					icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
+
+					self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
+				# --------------------------------------Item 5 Part 2 ends here ----------------------------------_
+
 				icmp = pkt.get_header(ICMP)
 				if icmp is not None and icmp.icmptype == ICMPType.EchoRequest:
 
@@ -112,40 +165,28 @@ class Router(object):
 					icmp_reply.icmptype = ICMPType.EchoReply
 					icmp_reply.icmpdata.sequence = icmp.icmpdata.sequence
 					#	icmp_reply.sequence \
-					#seq	= icmp.icmpdata.sequence
+					# seq	= icmp.icmpdata.sequence
 					log_debug("the icmp is {}".format(str(icmp)))
 					icmp_reply.icmpdata.identifier = icmp.icmpdata.identifier
 					icmp_reply.icmpdata.data = icmp.icmpdata.data
 
-					ip_reply = IPv4()
-					ip_reply.protocol = IPProtocol.ICMP
-					ip_reply.src = dstaddr
-					ip_reply.dst = ip.src
-					ip_reply.ttl = 30  # Find standard and change ttl to that
+					self.router_icmp_forward_helper(icmp_reply,dstaddr,ip.src)
 
-					reply_pkt = ip_reply + icmp_reply
-					self.router_forward(dev,reply_pkt)
-				else:	#An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request
+				else:  # An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request
 					# --------------------------------------Item 5 Part 4 starts here ----------------------------------
-					if (ip.ttl == 0):
-						log_debug("An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request.Sending a ICMP port unreachable error message.")
-						icmp_reply = ICMP()
-						icmp_reply.icmptype = ICMPType.DestinationUnreachable
-						icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].PortUnreachable
-						icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
-						icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
-						ip_reply = IPv4()
-						ip_reply.protocol = IPProtocol.ICMP
-						ip_reply.src = dev.ipaddr
-						ip_reply.dst = ip.src
-						ip_reply.ttl = 30  # Find standard and change ttl to that
+					log_debug(
+						"An incoming packet is destined to an IP addresses assigned to one of the router's interfaces, but the packet is not an ICMP echo request.Sending a ICMP port unreachable error message.")
+					icmp_reply = ICMP()
+					icmp_reply.icmptype = ICMPType.DestinationUnreachable
+					icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].PortUnreachable
+					icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
+					icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
-						reply_pkt = ip_reply + icmp_reply
-						self.router_forward(dev, reply_pkt)
-					# --------------------------------------Item 5 Part 4 ends here ----------------------------------
-			# --------------------------------------Item 4 ends here -------------------------------------------
-			# --------------------------------------Item 5 Part 1 starts here ----------------------------------
+					self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
+				# --------------------------------------Item 5 Part 4 ends here ----------------------------------
+				# --------------------------------------Item 4 ends here -------------------------------------------
+					# --------------------------------------Item 5 Part 1 starts here ----------------------------------
 			elif port == '':
 				log_debug("No match found. Sending a destination network unreachable error ICMP reply.")
 				icmp_reply = ICMP()
@@ -154,17 +195,10 @@ class Router(object):
 				icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
 				icmp_reply.icmpdata.origdgramlen = len(pkt)	#This should be optional probably
 
-				ip_reply = IPv4()
-				ip_reply.protocol = IPProtocol.ICMP
-				ip_reply.src = dev.ipaddr
-				ip_reply.dst = ip.src
-				ip_reply.ttl = 30  # Find standard and change ttl to that
-
-				reply_pkt = ip_reply + icmp_reply
-				self.router_forward(dev, reply_pkt)
+				self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
 			# --------------------------------------Item 5 Part 1 ends here -----------------------------------
-			elif IPv4Address(nexthop) in [intf.ipaddr for intf in self.interfaces]:
-				log_debug("Packet meant for the router. Do nothing.")
+			#elif IPv4Address(nexthop) in [intf.ipaddr for intf in self.interfaces]:
+			#	log_debug("Packet meant for the router. Do nothing.")
 			else:
 				ip.ttl -= 1
 
@@ -177,15 +211,9 @@ class Router(object):
 					icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
 					icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
-					ip_reply = IPv4()
-					ip_reply.protocol = IPProtocol.ICMP
-					ip_reply.src = dev.ipaddr
-					ip_reply.dst = ip.src
-					ip_reply.ttl = 30  # Find standard and change ttl to that
-
-					reply_pkt = ip_reply + icmp_reply
-					self.router_forward(dev, reply_pkt)
+					self.router_icmp_forward_helper(icmp_reply, dstaddr, ip.src)
 				# --------------------------------------Item 5 Part 2 ends here ----------------------------------_
+
 
 				all_ports = [intf.name for intf in self.interfaces]
 				port_index = all_ports.index(port)
@@ -209,7 +237,7 @@ class Router(object):
 						# Create entry for nexthop IP & buffer the packet
 						self.buffer[nexthop] = []
 						self.buffer[nexthop].append(pkt)
-						self.buffer_info[nexthop] = [port, time.time() * 1000, arppacket, 1, ip.src, dev]
+						self.buffer_info[nexthop] = [port, time.time() * 1000, arppacket, 1, ip.src, ip.dst]
 						# Send an ARP request
 						self.net.send_packet(port, arppacket)
 					else:  # no need to send ARP request, store the packet in the buffer
@@ -232,28 +260,33 @@ class Router(object):
 	def router_main(self):    
 		while True:
 			gotpkt = True
+			log_debug("Started router main iteration")
+
 			#------------------------------ this portion is related to Item 3-----------------------------
 			#update ARP cache periodically
-			for key in self.buffer_info:
+			for key in list(self.buffer_info):
 				if time.time()*1000 - self.buffer_info[key][1] >= 1000:
-					if self.buffer_info[key][3] > 5:	#Send ICMP error message if ARP request is not satisfied even after 5 retransmissions
+					if self.buffer_info[key][3] == 5:	#Send ICMP error message if ARP request is not satisfied even after 5 retransmissions
 						# --------------------------------------Item 5 Part 3 starts here ----------------------------------
-						if (ip.ttl == 0):
-							log_debug("5 retransmissions of ARP query over.Sending a ICMP host unreachable error message.")
-							icmp_reply = ICMP()
-							icmp_reply.icmptype = ICMPType.DestinationUnreachable
-							icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].HostUnreachable
-							icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
-							icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
-							ip_reply = IPv4()
-							ip_reply.protocol = IPProtocol.ICMP
-							ip_reply.src = self.buffer_info[key][5].ipaddr
-							ip_reply.dst = self.buffer_info[key][4]
-							ip_reply.ttl = 30  # Find standard and change ttl to that
+						log_debug("5 retransmissions of ARP query over.Sending a ICMP host unreachable error message.")
+						icmp_reply = ICMP()
+						icmp_reply.icmptype = ICMPType.DestinationUnreachable
+						icmp_reply.icmpcode = ICMPTypeCodeMap[ICMPType.DestinationUnreachable].HostUnreachable
+						icmp_reply.icmpdata.data = pkt.to_bytes()[:28]
+						icmp_reply.icmpdata.origdgramlen = len(pkt)  # This should be optional probably
 
-							reply_pkt = ip_reply + icmp_reply
-							self.router_forward(self.buffer_info[key][5], reply_pkt)
+						'''
+						ip_reply = IPv4()
+						ip_reply.protocol = IPProtocol.ICMP
+						ip_reply.src = self.buffer_info[key][5]
+						ip_reply.dst = self.buffer_info[key][4]
+						ip_reply.ttl = 30  # Find standard and change ttl to that
+
+						reply_pkt = ip_reply + icmp_reply
+						self.router_forward(self.buffer_info[key][5], reply_pkt)
+						'''
+						self.router_icmp_forward_helper(icmp_reply, self.buffer_info[key][5], self.buffer_info[key][4])
 						# --------------------------------------Item 5 Part 3 ends here ----------------------------------_
 						del self.buffer[key]
 						del self.buffer_info[key]
