@@ -1,10 +1,14 @@
-# In_progress
+# Overview
 
-##Observations:
-1)Randomly getting all pass vs some failures sepcifically at test 26 for the timeout based entry removal implementaion. Majority of the time this is happening when output is redirected to a file instead of standard output.
+##Part 1:
+Implemented the core functionalities of an Ethernet learning switch using the Switchyard framework
 
-##Tasks
-1)Implemented all three cases separately
-2)Ran and passed all given test cases
-3)Ran implemeented switches in Mininet (interesting observations)
-4)ToDO: Finish custom test cases
+##Part 2:
+Created a nearly fully functional IPv4 router. At a high level, the router has the following capabilities:
+
+    Responding to/Making ARP requests
+    Receiving packets and forwarding them to their destination by using a lookup table
+    Responding to/Generating ICMP messages
+
+##Part 3:
+Building a reliable communication library in Switchyard that will consist of 3 agents. At a high level, a blaster will send data packets to a blastee through a middlebox.
