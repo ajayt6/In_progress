@@ -11,6 +11,13 @@ def switchy_main(net):
     my_interfaces = net.interfaces()
     mymacs = [intf.ethaddr for intf in my_interfaces]
 
+    blaster_param_file = open("blaster_params.txt")
+    params = blaster_param_file.readlines()[0].strip('\n').split(' ')
+    blaster_param_file.close()
+    # -b <blaster_IP> -n <num>
+    blaster_IP = params[1]
+    num = params[3]
+
     while True:
         gotpkt = True
         try:
@@ -47,6 +54,8 @@ def switchy_main(net):
             #Create an ACK packet and send
             ack_pkt = Ethernet() + IPv4() + UDP()
             ack_pkt[1].protocol = IPProtocol.UDP
+            ack_pkt[1].srcip = '10.0.0.14'
+            ack_pkt[1].dstip = blaster_IP
             ack_pkt[2].srcport = 6666
             ack_pkt[2].dstport = 9999
             ack_pkt = ack_pkt + RawPacketContents(seq_num_bytes) + ack_payload
