@@ -10,7 +10,13 @@ from random import randint
 import time
 import struct
 import sys
-import time
+from threading import Timer
+
+
+def timeout():
+    print("Game over")
+
+
 
 def switchy_main(net):
     my_intf = net.interfaces()
@@ -20,6 +26,7 @@ def switchy_main(net):
     RHS = 1
     SW = None #Get this from params
     total_sent = 0
+    total_sent_acked = 0
     total_time = 0
     num_reTX = 0
     num_coarseTO = 0
@@ -40,7 +47,7 @@ def switchy_main(net):
     SW = sender_window
     SW_dict = {}
 
-    while total_sent <= num:
+    while total_sent_acked < num:
 
         gotpkt = True
         try:
@@ -70,7 +77,7 @@ def switchy_main(net):
             seq_num = int.from_bytes(seq_num_bytes,byteorder = 'big')
 
             print("ACK received from blastee via middlebox with seq num: ", str(seq_num))
-
+            total_sent_acked += 1
             if seq_num in SW_dict:
                 #print("Going to set")
                 SW_dict[seq_num] = 1
@@ -105,10 +112,14 @@ def switchy_main(net):
                 SW_dict[seq_num] = 0
                 RHS += 1
                 seq_num_bytes = struct.pack('>I', seq_num) #seq_num.to_bytes((seq_num.bit_length()+1) // 8 , 'big') or b'/0'
-                payload_str = "mininet is awesome and this poject as a whole is really informative"
+                payload_str = "mininet is awesome and this poject as a whole is really informative."
 
-                #length = sys.getsizeof(payload_str)
-                payload_str = payload_str[:length]
+                length_InBytes_payload_str = sys.getsizeof(payload_str)
+                if length < length_InBytes_payload_str:
+                    payload_str = payload_str[:length]
+                elif length > length_InBytes_payload_str:
+                    payload_str = payload_str + "0" * (length - length_InBytes_payload_str)
+
                 length_bytes = struct.pack('>H', length)	#length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
 
                 #Check and confirm if RawPacketContents takes care of big endianness
@@ -129,7 +140,7 @@ def switchy_main(net):
 
     net.shutdown()
 
-    if total_sent == num:
+    if total_sent_acked == num:
         '''
         Total TX time (in seconds): Time between the first packet sent and last packet ACKd
         Number of reTX: Number of retransmitted packets, this doesn't include the first transmission of a packet. Also if the same packet is retransmitted more than once, all of them will count.
