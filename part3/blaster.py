@@ -8,6 +8,7 @@ from switchyard.lib.packet import *
 from switchyard.lib.common import *
 from random import randint
 import time
+import struct
 import sys
 import time
 
@@ -30,11 +31,11 @@ def switchy_main(net):
     blaster_param_file.close()
     #-b <blastee_IP> -n <num> -l <length> -w <sender_window> -t <timeout> -r <recv_timeout>
     blastee_IP = params[1]
-    num = params[3]
-    length = params[5]
-    sender_window = params[7]
-    timeout = params[9]
-    recv_timeout = params[11]
+    num = int(params[3])
+    length = int(params[5])
+    sender_window = int(params[7])
+    timeout = float(params[9])
+    recv_timeout = float(params[11]) # assume recv_to < to
 
     SW = sender_window
     SW_dict = {}
@@ -70,7 +71,7 @@ def switchy_main(net):
 
         if gotpkt:
             log_debug("I got a packet")
-
+			print("ACK received from blastee via middlebox", str(pkt))
             #Extract seq_num of ack packet
             # Extract sequence number
             ether_header_recv = pkt.get_header_index(Ethernet)
@@ -100,6 +101,9 @@ def switchy_main(net):
                 Creating the headers for the packet
                 '''
                 pkt = Ethernet() + IPv4() + UDP()
+				pkt[0].src = '10:00:00:00:00:01'
+            	pkt[0].dst = '40:00:00:00:00:01'
+            	pkt[0].ethertype = EtherType.IPv4
                 pkt[1].protocol = IPProtocol.UDP
                 pkt[1].srcip = '10.0.0.7'
                 pkt[1].dstip = blastee_IP
@@ -110,13 +114,15 @@ def switchy_main(net):
                 #Take care of fixed length of 32 bits for seq_num and 16 bits for length -> This logic of ensuring the specific fixed length has to be ensured
                 seq_num = RHS
                 SW_dict[seq_num] = 1
-                seq_num_bytes = seq_num.to_bytes((seq_num.bit_length()+1) // 8 , 'big') or b'/0'
+                seq_num_bytes = struct.pack('>I', seq_num) #seq_num.to_bytes((seq_num.bit_length()+1) // 8 , 'big') or b'/0'
                 payload_str = "mininet is awesome"
                 length = sys.getsizeof(payload_str)
-                length_bytes = length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
+                length_bytes = struct.pack('>H', payload_len)	#length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
 
                 #Check and confirm if RawPacketContents takes care of big endianness
-                pkt += RawPacketContents(seq_num_bytes.append(length_bytes)) + RawPacketContents(payload_str)
+                pkt = pkt +  pkt.add_header(seq_bytes) + pkt.add_header(len_bytes) #+pkt.add_payload(payload_bytes)
+            	print("Packet sent to blastee via middlebox......")
+				#pkt += RawPacketContents(seq_num_bytes.append(length_bytes)) + RawPacketContents(payload_str)
 
                 '''
                 Do other things here and send packet
