@@ -40,22 +40,7 @@ def switchy_main(net):
     SW = sender_window
     SW_dict = {}
 
-    while True:
-
-        if total_sent == num:
-            '''
-            Total TX time (in seconds): Time between the first packet sent and last packet ACKd
-            Number of reTX: Number of retransmitted packets, this doesn't include the first transmission of a packet. Also if the same packet is retransmitted more than once, all of them will count.
-            Number of coarse TOs: Number of coarse timeouts
-            Throughput (Bps): You will obtain this value by dividing the total # of sent bytes(from blaster to blastee) by total TX time. This will include all the retransmissions as well! When calculating the bytes, only consider the length of the variable length payload!
-            Goodput (Bps): You will obtain this value by dividing the total # of sent bytes(from blaster to blastee) by total TX time. However, this will NOT include the bytes sent due to retransmissions! When calculating the bytes, only consider the length of the variable length payload!
-            '''
-
-            print("Total TX time (in seconds): " + str(total_time))
-            print("Number of reTX: " + str(num_reTX))
-            print("Number of coarse TOs: " + str(num_coarseTO))
-            print("Throughput (Bps): " + str(throughput))
-            print("Goodput (Bps): " + str(goodput))
+    while total_sent <= num:
 
         gotpkt = True
         try:
@@ -71,7 +56,7 @@ def switchy_main(net):
 
         if gotpkt:
             log_debug("I got a packet")
-            print("ACK received from blastee via middlebox", str(pkt))
+            #print("ACK received from blastee via middlebox", str(pkt))
             #Extract seq_num of ack packet
             # Extract sequence number
             ether_header_recv = pkt.get_header_index(Ethernet)
@@ -84,12 +69,16 @@ def switchy_main(net):
             seq_num_bytes = pkt.to_bytes()[:4]
             seq_num = int.from_bytes(seq_num_bytes,byteorder = 'big')
 
+            print("ACK received from blastee via middlebox with seq num: ", str(seq_num))
+
             if seq_num in SW_dict:
+                #print("Going to set")
                 SW_dict[seq_num] = 1
 
             #Ensure condition 2
-            while SW_dict[LHS] != None and SW_dict[LHS] == 1:
+            while LHS in SW_dict and SW_dict[LHS] == 1:
                 LHS += 1
+            print("The dict is: " + str(SW_dict))
 
 
         else:
@@ -110,18 +99,21 @@ def switchy_main(net):
                 pkt[2].srcport = 9999
                 pkt[2].dstport = 6666
 
-                RHS += 1
+
                 #Take care of fixed length of 32 bits for seq_num and 16 bits for length -> This logic of ensuring the specific fixed length has to be ensured
                 seq_num = RHS
-                SW_dict[seq_num] = 1
+                SW_dict[seq_num] = 0
+                RHS += 1
                 seq_num_bytes = struct.pack('>I', seq_num) #seq_num.to_bytes((seq_num.bit_length()+1) // 8 , 'big') or b'/0'
-                payload_str = "mininet is awesome"
-                length = sys.getsizeof(payload_str)
+                payload_str = "mininet is awesome and this poject as a whole is really informative"
+
+                #length = sys.getsizeof(payload_str)
+                payload_str = payload_str[:length]
                 length_bytes = struct.pack('>H', length)	#length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
 
                 #Check and confirm if RawPacketContents takes care of big endianness
-                pkt = pkt +  pkt.add_header(seq_num_bytes) + pkt.add_header(length_bytes) #+pkt.add_payload(payload_bytes)
-                print("Packet sent to blastee via middlebox......")
+                pkt = pkt +  pkt.add_header(seq_num_bytes) + pkt.add_header(length_bytes) + RawPacketContents(payload_str) #+pkt.add_payload(payload_bytes)
+                print("Packet with seq no. " + str(seq_num) + "sent to blastee via middlebox......")
 				#pkt += RawPacketContents(seq_num_bytes.append(length_bytes)) + RawPacketContents(payload_str)
 
                 '''
@@ -133,4 +125,21 @@ def switchy_main(net):
                 net.send_packet("blaster-eth0", pkt)
                 total_sent = total_sent + 1
 
+
+
     net.shutdown()
+
+    if total_sent == num:
+        '''
+        Total TX time (in seconds): Time between the first packet sent and last packet ACKd
+        Number of reTX: Number of retransmitted packets, this doesn't include the first transmission of a packet. Also if the same packet is retransmitted more than once, all of them will count.
+        Number of coarse TOs: Number of coarse timeouts
+        Throughput (Bps): You will obtain this value by dividing the total # of sent bytes(from blaster to blastee) by total TX time. This will include all the retransmissions as well! When calculating the bytes, only consider the length of the variable length payload!
+        Goodput (Bps): You will obtain this value by dividing the total # of sent bytes(from blaster to blastee) by total TX time. However, this will NOT include the bytes sent due to retransmissions! When calculating the bytes, only consider the length of the variable length payload!
+        '''
+
+        print("Total TX time (in seconds): " + str(total_time))
+        print("Number of reTX: " + str(num_reTX))
+        print("Number of coarse TOs: " + str(num_coarseTO))
+        print("Throughput (Bps): " + str(throughput))
+        print("Goodput (Bps): " + str(goodput))
