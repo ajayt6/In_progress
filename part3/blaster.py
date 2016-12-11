@@ -71,7 +71,7 @@ def switchy_main(net):
 
         if gotpkt:
             log_debug("I got a packet")
-			print("ACK received from blastee via middlebox", str(pkt))
+            print("ACK received from blastee via middlebox", str(pkt))
             #Extract seq_num of ack packet
             # Extract sequence number
             ether_header_recv = pkt.get_header_index(Ethernet)
@@ -101,9 +101,9 @@ def switchy_main(net):
                 Creating the headers for the packet
                 '''
                 pkt = Ethernet() + IPv4() + UDP()
-				pkt[0].src = '10:00:00:00:00:01'
-            	pkt[0].dst = '40:00:00:00:00:01'
-            	pkt[0].ethertype = EtherType.IPv4
+                pkt[0].src = '10:00:00:00:00:01'
+                pkt[0].dst = '40:00:00:00:00:01'
+                pkt[0].ethertype = EtherType.IPv4
                 pkt[1].protocol = IPProtocol.UDP
                 pkt[1].srcip = '10.0.0.7'
                 pkt[1].dstip = blastee_IP
@@ -117,11 +117,11 @@ def switchy_main(net):
                 seq_num_bytes = struct.pack('>I', seq_num) #seq_num.to_bytes((seq_num.bit_length()+1) // 8 , 'big') or b'/0'
                 payload_str = "mininet is awesome"
                 length = sys.getsizeof(payload_str)
-                length_bytes = struct.pack('>H', payload_len)	#length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
+                length_bytes = struct.pack('>H', length)	#length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
 
                 #Check and confirm if RawPacketContents takes care of big endianness
-                pkt = pkt +  pkt.add_header(seq_bytes) + pkt.add_header(len_bytes) #+pkt.add_payload(payload_bytes)
-            	print("Packet sent to blastee via middlebox......")
+                pkt = pkt +  pkt.add_header(seq_num_bytes) + pkt.add_header(length_bytes) #+pkt.add_payload(payload_bytes)
+                print("Packet sent to blastee via middlebox......")
 				#pkt += RawPacketContents(seq_num_bytes.append(length_bytes)) + RawPacketContents(payload_str)
 
                 '''

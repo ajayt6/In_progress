@@ -1,1 +1,1 @@
--b <blastee_IP> -n <num> -l <length> -w <sender_window> -t <timeout> -r <recv_timeout>
+-b 10.0.0.14 -n 20 -l 20 -w 10 -t 1500 -r 1200

@@ -1,1 +1,1 @@
--b <blaster_IP> -n <num>
+-b 10.0.0.7 -n 20

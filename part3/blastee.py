@@ -63,8 +63,8 @@ def switchy_main(net):
             ack_pkt[2].srcport = 6666
             ack_pkt[2].dstport = 9999
             ack_pkt = ack_pkt + ack_pkt.add_header(seq_num_bytes) + ack_payload
-			#ack_pkt = ack_pkt + RawPacketContents(seq_num_bytes) + ack_payload
-			print("Sending ACK to blaster", str(ack_pkt))
+            #ack_pkt = ack_pkt + RawPacketContents(seq_num_bytes) + ack_payload
+            print("Sending ACK to blaster", str(ack_pkt))
             net.send_packet("blastee-eth0", ack_pkt)
 
 
