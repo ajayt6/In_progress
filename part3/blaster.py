@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-#Let Blaster IP be 10.0.0.7
-#Let Blastee IP be 10.0.0.14
+#Let Blaster IP be 192.168.100.1
+#Let Blastee IP be 192.168.200.1
 
 from switchyard.lib.address import *
 from switchyard.lib.packet import *
@@ -11,12 +11,6 @@ import time
 import struct
 import sys
 from threading import Timer
-
-
-def timeout():
-    print("Game over")
-
-
 
 def switchy_main(net):
     my_intf = net.interfaces()
@@ -46,8 +40,19 @@ def switchy_main(net):
 
     SW = sender_window
     SW_dict = {}
-
+    buffer_dict = {} #buffer to store the packets later for retransmission
+    timer = time.time()*1000
+    total_time = time.time()*1000
     while total_sent_acked < num:
+
+        if time.time()*1000 - timer > timeout :
+            num_coarseTO += 1
+            for key in buffer_dict:
+                print("Retransmit pkt with seq number "+ str(key) + " .....")
+                throughput += length
+                net.send_packet("blaster-eth0", buffer_dict[key])
+                num_reTX += 1
+            timer = time.time()*1000
 
         gotpkt = True
         try:
@@ -81,14 +86,14 @@ def switchy_main(net):
             if seq_num in SW_dict:
                 #print("Going to set")
                 SW_dict[seq_num] = 1
+                del buffer_dict[seq_num]
 
             #Ensure condition 2
             while LHS in SW_dict and SW_dict[LHS] == 1:
                 LHS += 1
             print("The dict is: " + str(SW_dict))
 
-
-        else:
+        elif not gotpkt and total_sent < num:  
             log_debug("Didn't receive anything")
 
             #Ensure condition 1
@@ -101,7 +106,7 @@ def switchy_main(net):
                 pkt[0].dst = '40:00:00:00:00:01'
                 pkt[0].ethertype = EtherType.IPv4
                 pkt[1].protocol = IPProtocol.UDP
-                pkt[1].srcip = '10.0.0.7'
+                pkt[1].srcip = '192.168.100.1'
                 pkt[1].dstip = blastee_IP
                 pkt[2].srcport = 9999
                 pkt[2].dstport = 6666
@@ -124,19 +129,20 @@ def switchy_main(net):
 
                 #Check and confirm if RawPacketContents takes care of big endianness
                 pkt = pkt +  pkt.add_header(seq_num_bytes) + pkt.add_header(length_bytes) + RawPacketContents(payload_str) #+pkt.add_payload(payload_bytes)
+                buffer_dict[seq_num] = pkt
                 print("Packet with seq no. " + str(seq_num) + "sent to blastee via middlebox......")
 				#pkt += RawPacketContents(seq_num_bytes.append(length_bytes)) + RawPacketContents(payload_str)
 
                 '''
                 Do other things here and send packet
                 '''
-                throughput = throughput + sys.getsizeof(pkt)
-                goodput += sys.getsizeof(pkt)
+                throughput = throughput + length #sys.getsizeof(pkt)
+                goodput += length #sys.getsizeof(pkt)
 
                 net.send_packet("blaster-eth0", pkt)
                 total_sent = total_sent + 1
 
-
+    total_time = time.time()*1000 - total_time
 
     net.shutdown()
 
@@ -149,8 +155,8 @@ def switchy_main(net):
         Goodput (Bps): You will obtain this value by dividing the total # of sent bytes(from blaster to blastee) by total TX time. However, this will NOT include the bytes sent due to retransmissions! When calculating the bytes, only consider the length of the variable length payload!
         '''
 
-        print("Total TX time (in seconds): " + str(total_time))
+        print("Total TX time (in seconds): " + str(total_time/1000))
         print("Number of reTX: " + str(num_reTX))
         print("Number of coarse TOs: " + str(num_coarseTO))
-        print("Throughput (Bps): " + str(throughput))
-        print("Goodput (Bps): " + str(goodput))
+        print("Throughput (Bps): " + str(throughput*1000/total_time))
+        print("Goodput (Bps): " + str(goodput*1000/total_time))

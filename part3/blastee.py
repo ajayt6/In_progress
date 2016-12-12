@@ -58,7 +58,7 @@ def switchy_main(net):
             ack_pkt[0].dst = '40:00:00:00:00:02'
             ack_pkt[0].ethertype = EtherType.IPv4
             ack_pkt[1].protocol = IPProtocol.UDP
-            ack_pkt[1].srcip = '10.0.0.14'
+            ack_pkt[1].srcip = '192.168.200.1'
             ack_pkt[1].dstip = blaster_IP
             ack_pkt[2].srcport = 6666
             ack_pkt[2].dstport = 9999
