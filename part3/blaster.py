@@ -52,12 +52,10 @@ def switchy_main(net):
                 throughput += length
                 net.send_packet("blaster-eth0", buffer_dict[key])
                 num_reTX += 1
-            timer = time.time()*1000
+            timer = time.time()*1000 # reset timer
 
         gotpkt = True
         try:
-            #Block for recv_timeout milliseconds
-            #time.sleep(1)
             dev,pkt = net.recv_packet(timeout=recv_timeout / 1000)
         except NoPackets:
             log_debug("No packets available in recv_packet")
@@ -81,17 +79,20 @@ def switchy_main(net):
             seq_num_bytes = pkt.to_bytes()[:4]
             seq_num = int.from_bytes(seq_num_bytes,byteorder = 'big')
 
-            print("ACK received from blastee via middlebox with seq num: ", str(seq_num))
-            total_sent_acked += 1
+            print("ACK received from blastee via middlebox with seq num : ", str(seq_num))
+            if seq_num in SW_dict and SW_dict[seq_num] == 0:
+                total_sent_acked += 1
             if seq_num in SW_dict:
                 #print("Going to set")
                 SW_dict[seq_num] = 1
-                del buffer_dict[seq_num]
+                if seq_num in buffer_dict:
+                    del buffer_dict[seq_num]
 
             #Ensure condition 2
             while LHS in SW_dict and SW_dict[LHS] == 1:
                 LHS += 1
-            print("The dict is: " + str(SW_dict))
+                timer = time.time()*1000   #reset timer
+            print("Packet status : " + str(SW_dict))
 
         elif not gotpkt and total_sent < num:  
             log_debug("Didn't receive anything")
@@ -117,27 +118,26 @@ def switchy_main(net):
                 SW_dict[seq_num] = 0
                 RHS += 1
                 seq_num_bytes = struct.pack('>I', seq_num) #seq_num.to_bytes((seq_num.bit_length()+1) // 8 , 'big') or b'/0'
-                payload_str = "mininet is awesome and this poject as a whole is really informative."
+                payload_str = '''mininet is awesome and this poject as a whole is really informative.'''
 
-                length_InBytes_payload_str = sys.getsizeof(payload_str)
+                length_InBytes_payload_str = len(payload_str)
                 if length < length_InBytes_payload_str:
                     payload_str = payload_str[:length]
                 elif length > length_InBytes_payload_str:
                     payload_str = payload_str + "0" * (length - length_InBytes_payload_str)
+                #print("payload string is :", payload_str, length, length_InBytes_payload_str)
 
                 length_bytes = struct.pack('>H', length)	#length.to_bytes((length.bit_length()+1) // 8 , 'big') or b'/0'
 
                 #Check and confirm if RawPacketContents takes care of big endianness
-                pkt = pkt +  pkt.add_header(seq_num_bytes) + pkt.add_header(length_bytes) + RawPacketContents(payload_str) #+pkt.add_payload(payload_bytes)
+                pkt = pkt.add_header(seq_num_bytes)
+                pkt = pkt.add_header(length_bytes)
+                pkt = pkt + RawPacketContents(payload_str)
                 buffer_dict[seq_num] = pkt
-                print("Packet with seq no. " + str(seq_num) + "sent to blastee via middlebox......")
-				#pkt += RawPacketContents(seq_num_bytes.append(length_bytes)) + RawPacketContents(payload_str)
+                print("Packet with seq no. " + str(seq_num) + " sent to blastee via middlebox......")
 
-                '''
-                Do other things here and send packet
-                '''
-                throughput = throughput + length #sys.getsizeof(pkt)
-                goodput += length #sys.getsizeof(pkt)
+                throughput = throughput + length
+                goodput += length
 
                 net.send_packet("blaster-eth0", pkt)
                 total_sent = total_sent + 1

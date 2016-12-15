@@ -31,7 +31,7 @@ def switchy_main(net):
             break
 
         if gotpkt:
-            print("Packet received from blaster via middlebox......", str(pkt))
+            print("Packet received from blaster via middlebox : ", str(pkt))
             log_debug("I got a packet from {}".format(dev))
             log_debug("Pkt: {}".format(pkt))
 
@@ -62,9 +62,9 @@ def switchy_main(net):
             ack_pkt[1].dstip = blaster_IP
             ack_pkt[2].srcport = 6666
             ack_pkt[2].dstport = 9999
-            ack_pkt = ack_pkt + ack_pkt.add_header(seq_num_bytes) + ack_payload
+            ack_pkt = ack_pkt.add_header(seq_num_bytes) + ack_payload
             #ack_pkt = ack_pkt + RawPacketContents(seq_num_bytes) + ack_payload
-            print("Sending ACK to blaster", str(ack_pkt))
+            print("Sending ACK to blaster : ", str(ack_pkt))
             net.send_packet("blastee-eth0", ack_pkt)
 
 

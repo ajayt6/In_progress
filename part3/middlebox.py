@@ -22,7 +22,7 @@ def switchy_main(net):
     f.close()
     d_rate = float(val)
 
-    total_sent = 0
+    #total_sent = 0
     while True:
 
         gotpkt = True
@@ -41,7 +41,7 @@ def switchy_main(net):
 
         if dev == "middlebox-eth0":
             log_debug("Received from blaster")
-            print("packet received from blaster") #, str(pkt))
+            print("packet received from blaster : ", str(pkt))
 
             if (random.random() > d_rate):
                 ether_index = pkt.get_header_index(Ethernet)
@@ -52,14 +52,14 @@ def switchy_main(net):
                 ether.dst = mac_IP[1][0]
                 pkt.insert_header(ether_index, ether)
 
-                total_sent = total_sent + 1
-                print("Sending packet and total sent is: " + str(total_sent))
+                #total_sent = total_sent + 1
+                #print("Sending packet and total sent is: " + str(total_sent))
                 net.send_packet("middlebox-eth1", pkt)
             else:
                 pass
         elif dev == "middlebox-eth1":
             log_debug("Received from blastee")
-            print("ACK received from blastee", str(pkt))
+            print("ACK received from blastee : ", str(pkt))
             ether_index = pkt.get_header_index(Ethernet)
             ether = pkt.get_header(Ethernet)
             del pkt[ether_index]
